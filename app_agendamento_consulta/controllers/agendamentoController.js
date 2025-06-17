@@ -26,10 +26,59 @@ function postAgendarConsulta(req, res){
     
 }
 
+function getEditarAgendamentoView(req, res){
+    let id_agendamento = req.params.id;
+    AgendamentoConsulta.findOne({
+        where:{
+            id: id_agendamento
+        }
+    }).then((dados_consulta)=>{
+        res.render('editar_agendamento.html', {dados_consulta});
+    }); 
+    
+}
+
+function postEditarAgendamento(req, res){
+    let dados_consulta = req.body;
+    let campos_invalidos = validarRequisicaoAgendamentoConsulta(dados_consulta);
+
+    if(campos_invalidos.length == 0){
+        AgendamentoConsulta.findOne({
+            where:{
+                id: dados_consulta.id
+            }
+        }).then((dados_agendamento)=>{
+            dados_agendamento.update(dados_consulta).then(()=>{
+                res.redirect('/agendamentos');
+            });
+            
+        }); 
+    }
+    else{
+        res.render('editar_agendamento.html', {campos_invalidos, dados_consulta});
+    }
+}
+
+function getExcluirAgendamento(req, res){
+    let id_agendamento = req.params.id;
+    AgendamentoConsulta.findOne({
+        where:{
+            id: id_agendamento
+        }
+    }).then((dados_consulta)=>{
+        dados_consulta.destroy().then(()=>{
+            res.redirect('/agendamentos');
+        });
+    }); 
+}
+
 module.exports = {
     getIndexView,
     postAgendarConsulta,
-    getAgendamentosView
+    getAgendamentosView,
+    getEditarAgendamentoView,
+    postEditarAgendamento,
+    getExcluirAgendamento
 }
 
 function validarRequisicaoAgendamentoConsulta(dados_consulta){
